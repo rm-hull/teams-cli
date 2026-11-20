@@ -10,6 +10,10 @@ A command-line tool for reading and searching Microsoft Teams chats through the 
 brew install rm-hull/tap/teams-cli
 ```
 
+### Windows
+
+Download the latest `teams-cli_<version>_windows_amd64.tar.gz` archive from the [releases page](https://gitlab.com/rm-hull/teams-cli/-/releases), extract it, and place `teams-cli.exe` in a directory on your `PATH`.
+
 ### Build from source
 
 ```sh
@@ -120,8 +124,8 @@ TEAMS_ENV_FILE=~/.config/teams/.env teams-cli list-chats
 
 ## Security
 
-- The MSAL token cache is stored unencrypted with owner-only permissions under the XDG state directory (`~/.local/state/teams-cli` on Linux, `~/Library/Application Support/teams-cli` on macOS).
-- The `.env` config file is stored under the XDG config directory (`~/.config/teams-cli/.env` on Linux, `~/Library/Application Support/teams-cli/.env` on macOS).
+- The MSAL token cache is stored unencrypted with owner-only permissions under the XDG state directory (`~/.local/state/teams-cli` on Linux, `~/Library/Application Support/teams-cli` on macOS, `%APPDATA%\teams-cli` on Windows).
+- The `.env` config file is stored under the XDG config directory (`~/.config/teams-cli/.env` on Linux, `~/Library/Application Support/teams-cli/.env` on macOS, `%APPDATA%\teams-cli\.env` on Windows).
 - Run `logout` to clear cached credentials.
 - Only use this tool where your organization permits access to Teams data.
 - Treat message bodies and search results as untrusted text.
