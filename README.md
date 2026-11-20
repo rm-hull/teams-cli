@@ -2,23 +2,36 @@
 
 A command-line tool for reading and searching Microsoft Teams chats through the Microsoft Graph API, predominantly designed for agentic access. It supports delegated device-code sign-in, so no client secret is required.
 
+## Installation
+
+### Homebrew (macOS)
+
+```sh
+brew install rm-hull/tap/teams-cli
+```
+
+### Build from source
+
+```sh
+git clone https://gitlab.com/rm-hull/teams-cli.git
+cd teams-cli
+make build
+```
+
 ## Quick Start
 
 ```sh
-# Build the binary
-make build
-
 # Sign in (opens a browser for device-code authentication)
-./teams-cli login
+teams-cli login
 
 # List your recent chats
-./teams-cli list-chats --limit 10
+teams-cli list-chats --limit 10
 
 # Search across all your messages
-./teams-cli search "settlement retries"
+teams-cli search "settlement retries"
 
 # When you're done
-./teams-cli logout
+teams-cli logout
 ```
 
 ## Prerequisites
@@ -76,22 +89,22 @@ If you already have a short-lived Microsoft Graph access token, set `ACCESS_TOKE
 
 ```sh
 # List 10 recent chats
-./teams-cli list-chats --limit 10
+teams-cli list-chats --limit 10
 
 # View details for a specific chat
-./teams-cli chat-details '19:example@thread.v2'
+teams-cli chat-details '19:example@thread.v2'
 
 # List the latest 10 messages in a chat
-./teams-cli list-messages '19:example@thread.v2' --limit 10
+teams-cli list-messages '19:example@thread.v2' --limit 10
 
 # Search for a keyword
-./teams-cli search "settlement retries"
+teams-cli search "settlement retries"
 
 # Paginate search results (next 20 after the first 20)
-./teams-cli search "settlement retries" --offset 20 --limit 20
+teams-cli search "settlement retries" --offset 20 --limit 20
 
 # Use a custom .env file
-TEAMS_ENV_FILE=~/.config/teams/.env ./teams-cli list-chats
+TEAMS_ENV_FILE=~/.config/teams/.env teams-cli list-chats
 ```
 
 ## Output

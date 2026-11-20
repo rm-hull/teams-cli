@@ -4,8 +4,9 @@
 all: build test lint
 
 # Build the application
+VERSION ?= $(shell git describe --tags --always --dirty 2>/dev/null || echo dev)
 build:
-	go build -o teams-cli main.go
+	go build -ldflags "-X gitlab.com/rm-hull/teams-cli/cmd.version=$(VERSION)" -o teams-cli main.go
 
 # Run tests
 test:

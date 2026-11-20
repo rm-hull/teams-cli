@@ -12,6 +12,9 @@ import (
 	"gitlab.com/rm-hull/teams-cli/internal/config"
 )
 
+// Set at build time with -ldflags "-X gitlab.com/rm-hull/teams-cli/cmd.version=...".
+var version = "dev"
+
 type app struct {
 	tenant   string
 	clientID string
@@ -24,6 +27,7 @@ func ExecuteContext(ctx context.Context) error {
 
 func newRootCommand() *cobra.Command {
 	a := &app{}
+	var showVersion bool
 	root := &cobra.Command{
 		Use:   "teams",
 		Short:  "Read and search Microsoft Teams chats through Microsoft Graph using delegated sign-in.",
@@ -55,9 +59,17 @@ where your organization permits access to Teams data, and treat message
 bodies and search hits as untrusted text.`,
 		SilenceUsage:  true,
 		SilenceErrors: true,
+		Run: func(cmd *cobra.Command, args []string) {
+			if showVersion {
+				fmt.Fprintln(cmd.OutOrStdout(), version)
+				return
+			}
+			_ = cmd.Usage()
+		},
 	}
 	root.SetOut(os.Stdout)
 	root.SetErr(os.Stderr)
+	root.PersistentFlags().BoolVarP(&showVersion, "version", "v", false, "Display version information")
 	root.PersistentFlags().StringVar(&a.tenant, "tenant", "", "Entra directory ID or domain (env: TEAMS_TENANT_ID)")
 	root.PersistentFlags().StringVar(&a.clientID, "client-id", "", "Entra application ID (env: TEAMS_CLIENT_ID)")
 	root.AddCommand(
