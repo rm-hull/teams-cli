@@ -61,7 +61,7 @@ bodies and search hits as untrusted text.`,
 		SilenceErrors: true,
 		Run: func(cmd *cobra.Command, args []string) {
 			if showVersion {
-				fmt.Fprintln(cmd.OutOrStdout(), version)
+				_, _ = fmt.Fprintln(cmd.OutOrStdout(), version)
 				return
 			}
 			_ = cmd.Usage()
