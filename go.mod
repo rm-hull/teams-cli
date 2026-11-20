@@ -4,6 +4,7 @@ go 1.26.0
 
 require (
 	github.com/AzureAD/microsoft-authentication-library-for-go v1.10.1
+	github.com/adrg/xdg v0.5.3
 	github.com/gofrs/flock v0.13.2
 	github.com/google/uuid v1.6.0
 	github.com/joho/godotenv v1.5.1

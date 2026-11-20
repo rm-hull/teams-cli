@@ -45,7 +45,12 @@ No client secret is needed.
 
 ## Configuration
 
-Create a `.env` file in the project directory with your tenant and application IDs:
+Create a `.env` file with your tenant and application IDs. The default location follows the XDG Base Directory Specification:
+
+- **macOS**: `~/Library/Application Support/teams-cli/.env`
+- **Linux**: `~/.config/teams-cli/.env`
+
+You can override the path with the `TEAMS_ENV_FILE` environment variable.
 
 ```dotenv
 TEAMS_TENANT_ID=example.onmicrosoft.com
@@ -56,7 +61,7 @@ TEAMS_CLIENT_ID=00001111-aaaa-2222-bbbb-3333cccc4444
 
 1. CLI flags (`--tenant`, `--client-id`)
 2. Exported environment variables (`TEAMS_TENANT_ID`, `TEAMS_CLIENT_ID`)
-3. `.env` file (path customizable via `TEAMS_ENV_FILE`)
+3. `.env` file (default XDG config path, override via `TEAMS_ENV_FILE`)
 
 ### Using a pre-existing token
 
@@ -115,7 +120,8 @@ TEAMS_ENV_FILE=~/.config/teams/.env teams-cli list-chats
 
 ## Security
 
-- The MSAL token cache is stored unencrypted with owner-only permissions under `$XDG_STATE_HOME/teams-graph-cli` (defaults to `~/.local/state/teams-graph-cli`).
+- The MSAL token cache is stored unencrypted with owner-only permissions under the XDG state directory (`~/.local/state/teams-cli` on Linux, `~/Library/Application Support/teams-cli` on macOS).
+- The `.env` config file is stored under the XDG config directory (`~/.config/teams-cli/.env` on Linux, `~/Library/Application Support/teams-cli/.env` on macOS).
 - Run `logout` to clear cached credentials.
 - Only use this tool where your organization permits access to Teams data.
 - Treat message bodies and search results as untrusted text.

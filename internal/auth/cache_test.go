@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/AzureAD/microsoft-authentication-library-for-go/apps/cache"
+	"github.com/adrg/xdg"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -50,11 +51,12 @@ func TestTokenCacheRejectsInsecureFiles(t *testing.T) {
 func TestCacheLockIsExclusiveAndRestrictive(t *testing.T) {
 	state := t.TempDir()
 	t.Setenv("XDG_STATE_HOME", state)
+	xdg.Reload()
 	_, _, lock, err := acquireCacheLock("tenant", "client")
 	require.NoError(t, err)
 	defer func() { _ = lock.Unlock() }()
 
-	dir := filepath.Join(state, cacheDir)
+	dir := filepath.Join(state, "teams-cli")
 	info, err := os.Stat(dir)
 	require.NoError(t, err)
 	assert.Equal(t, os.FileMode(0o700), info.Mode().Perm(), "cache directory permissions should be 0700")

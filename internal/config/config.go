@@ -7,6 +7,7 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/adrg/xdg"
 	"github.com/google/uuid"
 	"github.com/joho/godotenv"
 )
@@ -25,9 +26,12 @@ var (
 func Load(tenantFlag, clientIDFlag string) (Settings, error) {
 	envPath := os.Getenv("TEAMS_ENV_FILE")
 	if envPath == "" {
-		envPath = ".env"
-	}
-	if !filepath.IsAbs(envPath) {
+		var err error
+		envPath, err = xdg.ConfigFile("teams-cli/.env")
+		if err != nil {
+			return Settings{}, fmt.Errorf("determine config path: %w", err)
+		}
+	} else if !filepath.IsAbs(envPath) {
 		cwd, err := os.Getwd()
 		if err != nil {
 			return Settings{}, fmt.Errorf("find current directory: %w", err)

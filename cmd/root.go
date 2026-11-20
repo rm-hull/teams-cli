@@ -30,7 +30,7 @@ func newRootCommand() *cobra.Command {
 	var showVersion bool
 	root := &cobra.Command{
 		Use:   "teams",
-		Short:  "Read and search Microsoft Teams chats through Microsoft Graph using delegated sign-in.",
+		Short: "Read and search Microsoft Teams chats through Microsoft Graph using delegated sign-in.",
 		Long: `Read and search Microsoft Teams chats through Microsoft Graph using delegated sign-in.
 		
 Setup: use an approved Entra app with public client flows enabled and

@@ -12,12 +12,13 @@ import (
 	"strings"
 
 	"github.com/AzureAD/microsoft-authentication-library-for-go/apps/public"
+	"github.com/adrg/xdg"
 	"github.com/gofrs/flock"
 )
 
 const (
 	graphScope = "https://graph.microsoft.com/Chat.Read"
-	cacheDir   = "teams-graph-cli"
+	cacheDir   = "teams-cli"
 )
 
 var aadCode = regexp.MustCompile(`\bAADSTS[0-9]+\b`)
@@ -115,18 +116,10 @@ func acquireCacheLock(tenant, clientID string) (string, string, *flock.Flock, er
 	if !cachePlatformSupported() {
 		return "", "", nil, errors.New("the token cache requires a POSIX system with owner-only permissions")
 	}
-	state := os.Getenv("XDG_STATE_HOME")
-	if state == "" {
-		home, err := os.UserHomeDir()
-		if err != nil {
-			return "", "", nil, fmt.Errorf("find home directory: %w", err)
-		}
-		state = filepath.Join(home, ".local", "state")
+	dir, err := xdg.StateFile(cacheDir)
+	if err != nil {
+		return "", "", nil, fmt.Errorf("determine state directory: %w", err)
 	}
-	if !filepath.IsAbs(state) {
-		return "", "", nil, errors.New("XDG_STATE_HOME must be an absolute path")
-	}
-	dir := filepath.Join(state, cacheDir)
 	if err := os.MkdirAll(dir, 0o700); err != nil {
 		return "", "", nil, fmt.Errorf("create token cache directory: %w", err)
 	}
