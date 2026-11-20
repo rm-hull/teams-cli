@@ -176,7 +176,7 @@ func (c *Client) Do(ctx context.Context, request Request) (map[string]any, error
 		}
 		return nil, errors.New("HTTPS request to Microsoft failed; check connectivity and proxy settings")
 	}
-	defer response.Body.Close()
+	defer func() { _ = response.Body.Close() }()
 	if response.StatusCode < http.StatusOK || response.StatusCode >= http.StatusMultipleChoices {
 		hint := ""
 		switch response.StatusCode {

@@ -59,7 +59,7 @@ func writePrivateFile(path string, data []byte) error {
 		return fmt.Errorf("create token cache file: %w", err)
 	}
 	tempPath := file.Name()
-	defer os.Remove(tempPath)
+	defer func() { _ = os.Remove(tempPath) }()
 
 	if err := file.Chmod(0o600); err != nil {
 		_ = file.Close()
@@ -83,7 +83,7 @@ func writePrivateFile(path string, data []byte) error {
 	if err != nil {
 		return fmt.Errorf("open token cache directory: %w", err)
 	}
-	defer directory.Close()
+	defer func() { _ = directory.Close() }()
 	if err := directory.Sync(); err != nil {
 		return fmt.Errorf("sync token cache directory: %w", err)
 	}

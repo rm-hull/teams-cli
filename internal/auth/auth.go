@@ -27,7 +27,7 @@ func Authenticate(ctx context.Context, tenant, clientID string, login bool, prom
 	if err != nil {
 		return "", err
 	}
-	defer lock.Unlock()
+	defer func() { _ = lock.Unlock() }()
 
 	if !login {
 		if _, err := os.Lstat(cachePath); errors.Is(err, os.ErrNotExist) {
@@ -104,7 +104,7 @@ func Logout(_ context.Context, tenant, clientID string) error {
 	if err != nil {
 		return err
 	}
-	defer lock.Unlock()
+	defer func() { _ = lock.Unlock() }()
 	if err := os.Remove(cachePath); err != nil && !errors.Is(err, os.ErrNotExist) {
 		return fmt.Errorf("remove token cache: %w", err)
 	}

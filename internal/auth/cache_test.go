@@ -52,7 +52,7 @@ func TestCacheLockIsExclusiveAndRestrictive(t *testing.T) {
 	t.Setenv("XDG_STATE_HOME", state)
 	_, _, lock, err := acquireCacheLock("tenant", "client")
 	require.NoError(t, err)
-	defer lock.Unlock()
+	defer func() { _ = lock.Unlock() }()
 
 	dir := filepath.Join(state, cacheDir)
 	info, err := os.Stat(dir)
