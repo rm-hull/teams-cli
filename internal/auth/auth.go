@@ -169,7 +169,11 @@ func acquireCacheLock(tenant, clientID string) (string, string, *flock.Flock, er
 }
 
 func readPrivateFileIfPresent(path string) ([]byte, error) {
-	return readPrivateFile(path)
+	data, err := readPrivateFile(path)
+	if errors.Is(err, os.ErrNotExist) {
+		return nil, nil
+	}
+	return data, err
 }
 
 func safeSignInError(err error) error {

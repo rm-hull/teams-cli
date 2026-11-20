@@ -19,7 +19,7 @@ type Settings struct {
 
 var (
 	tenantPattern = regexp.MustCompile(`^[a-z0-9][a-z0-9-]*(?:\.[a-z0-9][a-z0-9-]*)*$`)
-	tokenPattern  = regexp.MustCompile(`^[A-Za-z0-9._~+/-]+=*$`)
+	tokenPattern  = regexp.MustCompile(`^[A-Za-z0-9][A-Za-z0-9._~+/-]*=?$`)
 )
 
 func Load(tenantFlag, clientIDFlag string) (Settings, error) {

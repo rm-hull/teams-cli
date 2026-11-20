@@ -214,5 +214,5 @@ func isDecimal(value string) bool {
 		return false
 	}
 	_, err := strconv.Atoi(value)
-	return err == nil && value[0] >= '0' && value[0] <= '9'
+	return err == nil
 }
