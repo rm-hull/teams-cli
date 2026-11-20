@@ -1,0 +1,52 @@
+version: 2
+
+project_name: teams-cli
+
+before:
+  hooks:
+    - go mod tidy
+
+builds:
+  - env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -s -w
+
+upx:
+  - enabled: true
+    compress: best
+    goos:
+      - linux
+
+report_sizes: true
+
+archives:
+  - formats: ["tar.gz"]
+    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+
+checksum:
+  name_template: "checksums.txt"
+
+homebrew_casks:
+  - name: teams-cli
+    repository:
+      owner: rm-hull
+      name: homebrew-tap
+      token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
+    homepage: "https://github.com/rm-hull/teams-cli"
+    description: "A command-line tool for reading and searching Microsoft Teams chats through the Microsoft Graph API."
+    directory: Casks
+    url:
+      verified: github.com/rm-hull/teams-cli
+    hooks:
+      post:
+        install_steps: |
+          on_macos do
+            run "/usr/bin/xattr", args: ["-dr", "com.apple.quarantine", "{{ .StagedPath }}/teams-cli"]
+          end

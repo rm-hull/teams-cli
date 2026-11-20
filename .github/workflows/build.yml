@@ -1,0 +1,89 @@
+name: Build and tag Go module
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      checks: write
+
+    steps:
+      - uses: actions/checkout@v7.0.1
+
+      - name: Setup Go
+        uses: actions/setup-go@v7.0.0
+        with:
+          go-version: "1.27"
+
+      - name: Cache Go modules & tools
+        uses: actions/cache@v6.1.0
+        with:
+          path: |
+            ~/.cache/go-build
+            ~/go/pkg/mod
+            ~/go/bin
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+
+      - name: Test
+        run: |
+          export PATH=$(go env GOPATH)/bin:$PATH
+          go install gotest.tools/gotestsum@latest
+          make test-ci
+
+      - name: Collect test results
+        if: always()
+        uses: actions/upload-artifact@v7.0.2
+        with:
+          name: test-reports
+          path: ./test-reports/
+
+      - name: Publish test results
+        uses: mikepenz/action-junit-report@v6.7.1
+        if: always()
+        with:
+          report_paths: "./test-reports/junit.xml"
+          comment: true
+          include_passed: true
+          detailed_summary: true
+
+      - name: Upload coverage to Coveralls
+        uses: shogo82148/actions-goveralls@v1.11.5
+        continue-on-error: true
+        with:
+          path-to-profile: profile.cov
+
+      - name: Lint
+        uses: golangci/golangci-lint-action@v9.3.0
+
+  tag-go-module:
+    runs-on: ubuntu-latest
+    needs: [build-and-test]
+    if: github.ref == 'refs/heads/main' && !startsWith(github.ref, 'refs/tags/')
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code (fetch tags)
+        uses: actions/checkout@v7.0.1
+        with:
+          fetch-depth: 0
+
+      - name: Bump version and push tag
+        id: tag_version
+        uses: mathieudutour/github-tag-action@v7.0.0
+        with:
+          github_token: ${{ secrets.HOMEBREW_TAP_GITHUB_TOKEN }}
+          default_bump: patch
+          release_branches: main
+          # fetch_all_tags: true    # optional if your repo has many tags
+          # create_annotated_tag: true  # optional
+
