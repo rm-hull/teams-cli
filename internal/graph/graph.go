@@ -190,21 +190,21 @@ func (c *Client) Do(ctx context.Context, request Request) (map[string]any, error
 				hint = " Wait at least " + retryAfter + " seconds before retrying."
 			}
 		}
-		return nil, fmt.Errorf("Microsoft Graph returned HTTP %d.%s", response.StatusCode, hint)
+		return nil, fmt.Errorf("Microsoft Graph returned HTTP %d.%s", response.StatusCode, hint) //nolint:staticcheck // Microsoft is a proper noun
 	}
 	decoder := json.NewDecoder(response.Body)
 	decoder.UseNumber()
 	var value any
 	if err := decoder.Decode(&value); err != nil {
-		return nil, errors.New("Microsoft Graph returned invalid JSON")
+		return nil, errors.New("Microsoft Graph returned invalid JSON") //nolint:staticcheck // Microsoft is a proper noun
 	}
 	var trailing any
 	if err := decoder.Decode(&trailing); !errors.Is(err, io.EOF) {
-		return nil, errors.New("Microsoft Graph returned invalid JSON")
+		return nil, errors.New("Microsoft Graph returned invalid JSON") //nolint:staticcheck // Microsoft is a proper noun
 	}
 	result, ok := value.(map[string]any)
 	if !ok {
-		return nil, errors.New("Microsoft Graph returned an unexpected JSON response")
+		return nil, errors.New("Microsoft Graph returned an unexpected JSON response") //nolint:staticcheck // Microsoft is a proper noun
 	}
 	return result, nil
 }

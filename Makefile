@@ -18,7 +18,7 @@ test-ci:
 
 # Run linting
 lint:
-	golangci-lint run
+	golangci-lint run ./...
 
 # Clean up build artifacts
 clean:

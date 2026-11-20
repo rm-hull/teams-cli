@@ -69,7 +69,7 @@ func Authenticate(ctx context.Context, tenant, clientID string, login bool, prom
 			return "", safeSignInError(err)
 		}
 		if deviceCode.Result.Message == "" || deviceCode.Result.UserCode == "" {
-			return "", errors.New("Entra did not return valid device-code instructions")
+			return "", errors.New("Entra did not return valid device-code instructions") //nolint:staticcheck // Entra is a proper noun
 		}
 		if prompts != nil {
 			if _, err := fmt.Fprintln(prompts, deviceCode.Result.Message); err != nil {
@@ -81,7 +81,7 @@ func Authenticate(ctx context.Context, tenant, clientID string, login bool, prom
 			return "", safeSignInError(err)
 		}
 		if result.AccessToken == "" {
-			return "", errors.New("Entra sign-in returned no access token")
+			return "", errors.New("Entra sign-in returned no access token") //nolint:staticcheck // Entra is a proper noun
 		}
 		return result.AccessToken, nil
 	}
@@ -181,7 +181,7 @@ func safeSignInError(err error) error {
 		return context.Canceled
 	}
 	if code := aadCode.FindString(err.Error()); code != "" {
-		return fmt.Errorf("Entra sign-in failed (%s); check the app, tenant, and consent policy", code)
+		return fmt.Errorf("Entra sign-in failed (%s); check the app, tenant, and consent policy", code) //nolint:staticcheck // Entra is a proper noun
 	}
-	return errors.New("Entra sign-in failed; check the app, tenant, and consent policy")
+	return errors.New("Entra sign-in failed; check the app, tenant, and consent policy") //nolint:staticcheck // Entra is a proper noun
 }
