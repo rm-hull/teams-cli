@@ -5,8 +5,10 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
-	"strings"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestBuildRequests(t *testing.T) {
@@ -29,12 +31,8 @@ func TestBuildRequests(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			got, err := test.got()
-			if err != nil {
-				t.Fatal(err)
-			}
-			if got.URL != test.want {
-				t.Fatalf("URL = %q, want %q", got.URL, test.want)
-			}
+			require.NoError(t, err)
+			assert.Equal(t, test.want, got.URL)
 		})
 	}
 }
@@ -43,9 +41,7 @@ func TestDoUsesBearerTokenAndDoesNotFollowRedirects(t *testing.T) {
 	requestCount := 0
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		requestCount++
-		if r.Header.Get("Authorization") != "Bearer test-token" {
-			t.Errorf("Authorization = %q", r.Header.Get("Authorization"))
-		}
+		assert.Equal(t, "Bearer test-token", r.Header.Get("Authorization"))
 		http.Redirect(w, r, "/redirected", http.StatusFound)
 	}))
 	defer server.Close()
@@ -57,12 +53,10 @@ func TestDoUsesBearerTokenAndDoesNotFollowRedirects(t *testing.T) {
 		},
 	}
 	result, err := client.Do(context.Background(), Request{Method: http.MethodGet, URL: server.URL})
-	if err == nil || !strings.Contains(err.Error(), "HTTP 302") {
-		t.Fatalf("Do error = %v, want HTTP 302", err)
-	}
-	if result != nil || requestCount != 1 {
-		t.Fatalf("result = %#v, requestCount = %d", result, requestCount)
-	}
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "HTTP 302")
+	assert.Nil(t, result)
+	assert.Equal(t, 1, requestCount)
 }
 
 func TestDoValidatesObjectJSONAndSanitizesHTTPError(t *testing.T) {
@@ -90,35 +84,27 @@ func TestDoValidatesObjectJSONAndSanitizesHTTPError(t *testing.T) {
 			client := NewClient("secret-token")
 			client.httpClient = server.Client()
 			_, err := client.Do(context.Background(), Request{Method: http.MethodGet, URL: server.URL})
-			if err == nil || !strings.Contains(err.Error(), test.wantErr) {
-				t.Fatalf("Do error = %v, want substring %q", err, test.wantErr)
-			}
-			if strings.Contains(err.Error(), "private") || strings.Contains(err.Error(), "secret-token") {
-				t.Fatalf("error leaked response data or token: %v", err)
-			}
+			require.Error(t, err)
+			assert.Contains(t, err.Error(), test.wantErr)
+			assert.NotContains(t, err.Error(), "private")
+			assert.NotContains(t, err.Error(), "secret-token")
 		})
 	}
 }
 
 func TestListMessagesRequest(t *testing.T) {
 	request, err := ListMessagesRequest("19:abc@thread.v2", 3, "")
-	if err != nil {
-		t.Fatal(err)
-	}
-	if request.Method != http.MethodGet || request.URL != "https://graph.microsoft.com/v1.0/me/chats/19%3Aabc%40thread.v2/messages?%24orderby=createdDateTime+desc&%24top=3" {
-		t.Fatalf("unexpected request: %#v", request)
-	}
+	require.NoError(t, err)
+	assert.Equal(t, http.MethodGet, request.Method)
+	assert.Equal(t, "https://graph.microsoft.com/v1.0/me/chats/19%3Aabc%40thread.v2/messages?%24orderby=createdDateTime+desc&%24top=3", request.URL)
 }
 
 func TestNextLinkAndChatIDValidation(t *testing.T) {
 	for _, id := range []string{"", " ", ".", ".."} {
-		if _, err := ChatDetailsRequest(id); err == nil {
-			t.Errorf("ChatDetailsRequest(%q) unexpectedly succeeded", id)
-		}
+		_, err := ChatDetailsRequest(id)
+		assert.Error(t, err, "ChatDetailsRequest(%q) should fail", id)
 	}
-	if err := ValidateNextLink(""); err == nil {
-		t.Fatal("empty continuation link unexpectedly succeeded")
-	}
+	assert.Error(t, ValidateNextLink(""))
 }
 
 func TestRejectsUntrustedContinuationURL(t *testing.T) {
@@ -129,9 +115,7 @@ func TestRejectsUntrustedContinuationURL(t *testing.T) {
 		"http://graph.microsoft.com/v1.0/me/chats",
 		"https://graph.microsoft.com/beta/me/chats",
 	} {
-		if err := ValidateNextLink(link); err == nil {
-			t.Errorf("ValidateNextLink(%q) unexpectedly succeeded", link)
-		}
+		assert.Error(t, ValidateNextLink(link), "ValidateNextLink(%q) should fail", link)
 	}
 }
 
@@ -145,8 +129,7 @@ func TestSearchRequestRejectsInvalidBounds(t *testing.T) {
 		{query: "hello", offset: -1, limit: 1},
 		{query: "hello", limit: 51},
 	} {
-		if _, err := SearchRequest(test.query, test.offset, test.limit); err == nil {
-			t.Errorf("SearchRequest(%q, %d, %d) unexpectedly succeeded", test.query, test.offset, test.limit)
-		}
+		_, err := SearchRequest(test.query, test.offset, test.limit)
+		assert.Error(t, err, "SearchRequest(%q, %d, %d) should fail", test.query, test.offset, test.limit)
 	}
 }
