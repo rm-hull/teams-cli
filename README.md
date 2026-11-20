@@ -12,7 +12,7 @@ brew install rm-hull/tap/teams-cli
 
 ### Windows
 
-Download the latest `teams-cli_<version>_windows_amd64.tar.gz` archive from the [releases page](https://gitlab.com/rm-hull/teams-cli/-/releases), extract it, and place `teams-cli.exe` in a directory on your `PATH`.
+Download the latest `teams-cli_<version>_windows_amd64.tar.gz` archive from the [releases page](https://github.com/rm-hull/teams-cli/releases), extract it, and place `teams-cli.exe` in a directory on your `PATH`.
 
 ### Build from source
 
