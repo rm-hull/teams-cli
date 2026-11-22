@@ -29,7 +29,7 @@ func newRootCommand() *cobra.Command {
 	a := &app{}
 	var showVersion bool
 	root := &cobra.Command{
-		Use:   "teams",
+		Use:   "teams-cli",
 		Short: "Read and search Microsoft Teams chats through Microsoft Graph using delegated sign-in.",
 		Long: `Read and search Microsoft Teams chats through Microsoft Graph using delegated sign-in.
 		
